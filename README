@@ -1,4 +1,25 @@
-This is your new Play 2.0 application
-=====================================
+This app is designed to reproduce a compile error with large routes files in Play 2.0.x.  The issue seems to be resolved in Play 2.1, but I'm hoping the fix can be backported to 2.0 while 2.1 is still under active development.
 
-This file will be packaged with your application, when using `play dist`.
+Running this app with the default Play stack size of 1M will yield a StackOverflowException.  However, increasing the stack size to a large number such as -Xss=8m will expose the following:
+
+lay.api.UnexpectedException: Unexpected exception [Error: ch.epfl.lamp.fjbg.JCode$OffsetTooBigException: offset too big to fit in 16 bits: 38642]
+	at sbt.PlayReloader$$anon$2$$anonfun$reload$3$$anonfun$4$$anonfun$apply$12.apply(PlayReloader.scala:233) ~[na:na]
+	at sbt.PlayReloader$$anon$2$$anonfun$reload$3$$anonfun$4$$anonfun$apply$12.apply(PlayReloader.scala:226) ~[na:na]
+	at scala.Option.map(Option.scala:133) ~[scala-library.jar:0.11.3]
+	at sbt.PlayReloader$$anon$2$$anonfun$reload$3$$anonfun$4.apply(PlayReloader.scala:226) ~[na:na]
+	at sbt.PlayReloader$$anon$2$$anonfun$reload$3$$anonfun$4.apply(PlayReloader.scala:224) ~[na:na]
+	at scala.Either$LeftProjection.map(Either.scala:183) ~[scala-library.jar:0.11.3]
+java.lang.Error: ch.epfl.lamp.fjbg.JCode$OffsetTooBigException: offset too big to fit in 16 bits: 38642
+	at ch.epfl.lamp.fjbg.JFieldOrMethod.writeTo(JFieldOrMethod.java:130) ~[scala-compiler.jar:na]
+	at ch.epfl.lamp.fjbg.JClass.writeTo(JClass.java:358) ~[scala-compiler.jar:na]
+	at scala.tools.nsc.backend.jvm.BytecodeWriters$ClassBytecodeWriter$class.writeClass(BytecodeWriters.scala:87) ~[scala-compiler.jar:na]
+	at scala.tools.nsc.backend.jvm.GenJVM$JvmPhase$$anon$2.writeClass(GenJVM.scala:82) ~[scala-compiler.jar:na]
+	at scala.tools.nsc.backend.jvm.GenJVM$BytecodeGenerator.emitClass(GenJVM.scala:172) ~[scala-compiler.jar:na]
+	at scala.tools.nsc.backend.jvm.GenJVM$BytecodeGenerator.genClass(GenJVM.scala:314) ~[scala-compiler.jar:na]
+Caused by: ch.epfl.lamp.fjbg.JCode$OffsetTooBigException: offset too big to fit in 16 bits: 38642
+	at ch.epfl.lamp.fjbg.JCode.checkOffset16(JCode.java:903) ~[scala-compiler.jar:na]
+	at ch.epfl.lamp.fjbg.JCode.patchAllOffset(JCode.java:982) ~[scala-compiler.jar:na]
+	at ch.epfl.lamp.fjbg.JCode.freeze(JCode.java:102) ~[scala-compiler.jar:na]
+	at ch.epfl.lamp.fjbg.JMethod.freeze(JMethod.java:89) ~[scala-compiler.jar:na]
+	at ch.epfl.lamp.fjbg.JFieldOrMethod.writeTo(JFieldOrMethod.java:127) ~[scala-compiler.jar:na]
+	at ch.epfl.lamp.fjbg.JClass.writeTo(JClass.java:358) ~[scala-compiler.jar:na]
